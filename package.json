@@ -1,0 +1,27 @@
+{
+    "name": "serverless-node-js-rest-api",
+    "version": "1.0.0",
+    "description": "Node JS rest api with serverless framework",
+    "main": "handler.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "aws-lambda",
+        "serverless",
+        "node-js",
+        "rest-api",
+        "mongo-db"
+    ],
+    "author": "Ochirjav Jargalsaikhan",
+    "license": "MIT",
+    "devDependencies": {
+        "serverless-offline": "^11.0.1"
+    },
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "dotenv": "^16.0.3",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^6.6.3"
+    }
+}

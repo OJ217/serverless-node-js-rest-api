@@ -1,0 +1,111 @@
+# @format
+
+service: serverless-node-js-rest-api
+
+frameworkVersion: "3"
+
+provider:
+    name: aws
+    runtime: nodejs14.x
+    memorySize: 128
+    timeout: 20
+    stage: dev
+    profile: serverless-admin
+    region: ap-northeast-2
+
+functions:
+    verify_token:
+        handler: /src/auth/01_verify_token.verify_token
+    sign_up:
+        handler: /src/auth/02_sign_up.sign_up
+        events:
+            - http:
+                  path: auth/sign-up
+                  method: post
+                  cors: true
+    sign_in:
+        handler: /src/auth/03_sign_in.sign_in
+        events:
+            - http:
+                  path: auth/sign-in
+                  method: post
+                  cors: true
+    get_posts:
+        handler: /src/api/post/01_get_posts.get_posts
+        events:
+            - http:
+                  path: posts
+                  method: get
+                  cors: true
+    get_post:
+        handler: /src/api/post/02_get_post.get_post
+        events:
+            - http:
+                  path: post/{post_id}
+                  method: get
+                  cors: true
+    create_post:
+        handler: /src/api/post/03_create_post.create_post
+        events:
+            - http:
+                  path: post
+                  method: post
+                  authorizer: verify_token
+                  cors: true
+    update_post:
+        handler: /src/api/post/04_update_post.update_post
+        events:
+            - http:
+                  path: post/{post_id}
+                  method: put
+                  authorizer: verify_token
+                  cors: true
+    delete_post:
+        handler: /src/api/post/05_delete_post.delete_post
+        events:
+            - http:
+                  path: post/{post_id}
+                  method: delete
+                  authorizer: verify_token
+                  cors: true
+    like_post:
+        handler: /src/api/post/06_like_post.like_post
+        events:
+            - http:
+                  path: post/like/{post_id}
+                  method: put
+                  authorizer: verify_token
+                  cors: true
+    get_comments:
+        handler: /src/api/comment/01_get_comments.get_comments
+        events:
+            - http:
+                  path: post/comment/{post_id}
+                  method: get
+                  cors: true
+    create_comment:
+        handler: /src/api/comment/02_create_comment.create_comment
+        events:
+            - http:
+                  path: post/comment/{post_id}
+                  method: post
+                  authorizer: verify_token
+                  cors: true
+    update_comment:
+        handler: /src/api/comment/03_update_comment.update_comment
+        events:
+            - http:
+                  path: post/comment/{comment_id}
+                  method: put
+                  authorizer: verify_token
+                  cors: true
+    delete_comment:
+        handler: /src/api/comment/04_delete_comment.delete_comment
+        events:
+            - http:
+                  path: post/comment/{comment_id}
+                  method: delete
+                  authorizer: verify_token
+                  cors: true
+plugins:
+    - serverless-offline
