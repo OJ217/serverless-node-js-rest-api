@@ -26,10 +26,6 @@ module.exports.get_comments = async function (event, context, callback) {
                         {
                             path: "comment_creator",
                             select: "_id username email"
-                        },
-                        {
-                            path: "likes",
-                            select: "_id username email"
                         }
                     ]
                 })

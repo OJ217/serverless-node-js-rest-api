@@ -1,5 +1,6 @@
 'use strict'
 
+const User = require("../../model/User.model")
 const Post = require("../../model/Post.model")
 const { connect_db } = require("../../utils/db_util/db_connection.util")
 const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
@@ -15,6 +16,20 @@ module.exports.update_post = async function (event, context, callback) {
         .then(async () => {
             try {
                 const post = await Post.findById(post_id).populate("creator")
+
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
+                    )
+
+                const user = await User.findById(user_id)
+
+                if (!user)
+                    throw new Api_Error(
+                        404,
+                        "Could not delete post. User not found"
+                    )
 
                 if (!((post.creator._id).equals(user_id)))
                     throw new Api_Error(

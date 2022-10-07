@@ -41,7 +41,8 @@ module.exports.sign_in = async function (event, context, callback) {
                                     message: "Signed in successfully",
                                     result: {
                                         token,
-                                        ...user._doc
+                                        username: user.username,
+                                        email: user.email
                                     }
                                 }
                             )

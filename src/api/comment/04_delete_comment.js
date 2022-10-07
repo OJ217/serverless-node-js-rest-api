@@ -46,20 +46,15 @@ module.exports.delete_comment = async function (event, context, callback) {
                         "Forbidden to the resource."
                     )
 
-                const session = await mongoose.startSession()
-                session.startTransaction()
-
                 await comment.deleteOne()
 
-                const post_comment_index = post.comments.findIndex(comment => comment === comment_id)
+                const post_comment_index = post.comments.findIndex(comment => comment.equals(comment_id))
                 post.comments.splice(post_comment_index, 1)
-                const user_comment_index = user.comments.findIndex(comment => comment === comment_id)
+                const user_comment_index = user.comments.findIndex(comment => comment.equals(comment_id))
                 user.comments.splice(user_comment_index, 1)
 
                 await post.save()
                 await user.save()
-
-                session.commitTransaction()
 
                 return callback(
                     null,

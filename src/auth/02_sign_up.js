@@ -38,11 +38,12 @@ module.exports.sign_up = async function (event, context, callback) {
                             null,
                             new Api_Response(
                                 201,
-                                "Created new user",
                                 {
+                                    message: "Created new user",
                                     result: {
                                         token,
-                                        ...user._doc
+                                        username: user.username,
+                                        email: user.email
                                     }
                                 }
                             )
