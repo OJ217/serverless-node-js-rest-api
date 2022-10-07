@@ -80,14 +80,14 @@ functions:
         handler: /src/api/comment/01_get_comments.get_comments
         events:
             - http:
-                  path: post/comment/{post_id}
+                  path: post/comment/{id}
                   method: get
                   cors: true
     create_comment:
         handler: /src/api/comment/02_create_comment.create_comment
         events:
             - http:
-                  path: post/comment/{post_id}
+                  path: post/comment/{id}
                   method: post
                   authorizer: verify_token
                   cors: true
@@ -95,7 +95,7 @@ functions:
         handler: /src/api/comment/03_update_comment.update_comment
         events:
             - http:
-                  path: post/comment/{comment_id}
+                  path: post/comment/{id}
                   method: put
                   authorizer: verify_token
                   cors: true
@@ -103,7 +103,7 @@ functions:
         handler: /src/api/comment/04_delete_comment.delete_comment
         events:
             - http:
-                  path: post/comment/{comment_id}
+                  path: post/comment/{id}
                   method: delete
                   authorizer: verify_token
                   cors: true

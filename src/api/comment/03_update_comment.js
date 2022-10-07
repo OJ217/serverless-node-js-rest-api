@@ -9,7 +9,7 @@ const { Api_Response, Api_Error, Error_Response } = require("../../utils/respons
 module.exports.update_comment = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
-    const comment_id = event.pathParameters.comment_id
+    const comment_id = event.pathParameters.id
     const user_id = event.requestContext.authorizer.principalId.id
 
     const { comment_body } = JSON.parse(event.body)

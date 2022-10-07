@@ -7,7 +7,7 @@ const { Api_Response, Api_Error, Error_Response } = require("../../utils/respons
 module.exports.get_comments = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
-    const post_id = event.pathParameters.post_id
+    const post_id = event.pathParameters.id
 
     return connect_db()
         .then(async () => {

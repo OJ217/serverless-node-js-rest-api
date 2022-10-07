@@ -10,7 +10,7 @@ const { Api_Response, Api_Error, Error_Response } = require("../../utils/respons
 module.exports.create_comment = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
-    const post_id = event.pathParameters.post_id
+    const post_id = event.pathParameters.id
     const user_id = event.requestContext.authorizer.principalId.id
 
     const { comment_body } = JSON.parse(event.body)
