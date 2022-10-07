@@ -8,7 +8,7 @@ const { Api_Response, Api_Error, Error_Response } = require("../../utils/respons
 module.exports.create_post = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
-    const user_id = event.requestContext.authorizer.principalId.id
+    const user_id = JSON.parse(event.requestContext.authorizer.user_id)
 
     const { title, content } = JSON.parse(event.body)
 

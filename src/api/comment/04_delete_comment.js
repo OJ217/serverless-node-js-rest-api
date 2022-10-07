@@ -11,7 +11,7 @@ module.exports.delete_comment = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
     const comment_id = event.pathParameters.id
-    const user_id = event.requestContext.authorizer.principalId.id
+    const user_id = JSON.parse(event.requestContext.authorizer.user_id)
 
     return connect_db()
         .then(async () => {

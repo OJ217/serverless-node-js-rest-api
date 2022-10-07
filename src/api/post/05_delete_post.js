@@ -9,8 +9,9 @@ const { Api_Response, Api_Error, Error_Response } = require("../../utils/respons
 module.exports.delete_post = function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
+
     const post_id = event.pathParameters.post_id
-    const user_id = event.requestContext.authorizer.principalId.id
+    const user_id = JSON.parse(event.requestContext.authorizer.user_id)
 
     return connect_db()
         .then(async () => {

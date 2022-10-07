@@ -9,7 +9,7 @@ module.exports.update_post = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
 
     const post_id = event.pathParameters.post_id
-    const user_id = event.requestContext.authorizer.principalId.id
+    const user_id = JSON.parse(event.requestContext.authorizer.user_id)
     const { title, content } = JSON.parse(event.body)
 
     return connect_db()

@@ -1,7 +1,7 @@
 'use strict'
 
-module.exports.generate_auth_response = function (principalId, effect, methodArn) {
-    if (!effect || !methodArn) return null
+module.exports.generate_auth_response = function (user_id, effect) {
+    if (!effect) return null
 
     const policyDocument = {
         Version: "2012-10-17",
@@ -9,13 +9,17 @@ module.exports.generate_auth_response = function (principalId, effect, methodArn
             {
                 Action: "execute-api:Invoke",
                 Effect: effect,
-                Resource: methodArn
+                Resource: "*"
             }
-        ]
+        ],
+
     }
 
     return {
-        principalId,
-        policyDocument
+        principalId: user_id,
+        policyDocument,
+        context: {
+            user_id: JSON.stringify(user_id)
+        }
     }
 }

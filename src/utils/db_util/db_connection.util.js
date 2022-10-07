@@ -16,7 +16,6 @@ module.exports.connect_db = async function () {
 
     return mongoose.connect(process.env.DEV_MONGO_URI)
         .then(db => {
-            console.log("Hello world")
             db_connection = db.connections[0].readyState
         })
         .catch(err => {
