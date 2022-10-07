@@ -1,9 +1,9 @@
 'use strict'
 
-const { default: mongoose } = require("mongoose")
 const Post = require("../../model/Post.model")
 const User = require("../../model/User.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.like_post = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -16,33 +16,19 @@ module.exports.like_post = async function (event, context, callback) {
             try {
                 const post = await Post.findById(post_id).populate("creator")
 
-                if (!post) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Post with id ${post_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
                     )
-                }
 
                 const user = await User.findById(user_id)
 
-                if (!user) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Could not like/unlike post. User not found.`,
-                                error: true
-                            })
-                        }
+                if (!user)
+                    throw new Api_Error(
+                        404,
+                        `Could not like/unlike post. User not found.`
                     )
-                }
 
                 let like_message
 
@@ -64,24 +50,21 @@ module.exports.like_post = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
+                    new Api_Response(
+                        200,
+                        {
                             message: like_message,
                             success: true
-                        })
-                    }
+                        }
+                    )
                 )
             } catch (error) {
-                callback(
+                return callback(
                     null,
-                    {
-                        statusCode: error.statusCode || 500,
-                        body: JSON.stringify({
-                            message: `Could not like/unlike post with id ${post_id}`,
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        `Could not like/unlike post with id ${post_id}`
+                    )
                 )
             }
         })

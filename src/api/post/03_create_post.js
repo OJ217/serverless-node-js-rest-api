@@ -2,7 +2,8 @@
 
 const User = require("../../model/User.model")
 const Post = require("../../model/Post.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.create_post = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -16,18 +17,11 @@ module.exports.create_post = async function (event, context, callback) {
             try {
                 const user = await User.findById(user_id)
 
-                if (!user) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: "Could not create post. User not found",
-                                error: true
-                            })
-                        }
+                if (!user)
+                    throw new Api_Error(
+                        404,
+                        "Could not create post. User not found"
                     )
-                }
 
                 const post = await Post.create({
                     title,
@@ -42,25 +36,21 @@ module.exports.create_post = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 201,
-                        body: JSON.stringify({
+                    new Api_Response(
+                        201,
+                        {
                             message: "Successfully created new post",
                             result: populated_post
-                        })
-                    }
+                        }
+                    )
                 )
             } catch (error) {
-                console.log(error)
                 return callback(
                     null,
-                    {
-                        statusCode: error.statusCode || 500,
-                        body: JSON.stringify({
-                            message: "Could not create the new post",
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        "Could not create the new post"
+                    ),
                 )
             }
         })

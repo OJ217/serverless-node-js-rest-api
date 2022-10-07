@@ -1,7 +1,8 @@
 'use strict'
 
 const Post = require("../../model/Post.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.get_comments = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -13,18 +14,11 @@ module.exports.get_comments = async function (event, context, callback) {
             try {
                 const post = await Post.findById(post_id)
 
-                if (!post) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Post with id ${post_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
                     )
-                }
 
                 const post_comments = await post.populate({
                     path: "comments",
@@ -42,23 +36,18 @@ module.exports.get_comments = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
-                            result: post_comments.comments
-                        })
-                    }
+                    new Api_Response(
+                        200,
+                        { result: post_comments.comments }
+                    )
                 )
             } catch (error) {
-                callback(
+                return callback(
                     null,
-                    {
-                        statusCode: err.statusCode || 500,
-                        body: JSON.stringify({
-                            message: "Could not fetch post comments",
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        "Could not fetch post comments"
+                    )
                 )
             }
         })

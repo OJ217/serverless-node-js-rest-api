@@ -2,7 +2,7 @@
 
 require("dotenv").config()
 const jwt = require("jsonwebtoken")
-const { generate_auth_response } = require("../utils/auth_response.util")
+const { generate_auth_response } = require("../utils/responses/auth_response.util")
 
 module.exports.verify_token = function (event, context, callback) {
     if (event.authorizationToken) {

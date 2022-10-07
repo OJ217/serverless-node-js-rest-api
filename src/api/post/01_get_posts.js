@@ -1,7 +1,8 @@
 'use strict'
 
 const Post = require("../../model/Post.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.get_posts = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -13,23 +14,18 @@ module.exports.get_posts = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
-                            result: posts
-                        })
-                    }
+                    new Api_Response(
+                        200,
+                        { result: posts }
+                    )
                 )
             } catch (error) {
-                callback(
+                return callback(
                     null,
-                    {
-                        statusCode: err.statusCode || 500,
-                        body: JSON.stringify({
-                            message: "Could not fetch posts",
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        "Could not fetch posts"
+                    )
                 )
             }
         })

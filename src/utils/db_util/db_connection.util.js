@@ -14,7 +14,7 @@ module.exports.connect_db = async function () {
 
     console.log("=> using new database connection")
 
-    return mongoose.connect(process.env.MONGO_URI)
+    return mongoose.connect(process.env.LOCAL_MONGO_URI)
         .then(db => {
             console.log("Hello world")
             db_connection = db.connections[0].readyState

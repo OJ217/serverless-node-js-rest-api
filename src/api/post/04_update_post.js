@@ -1,7 +1,8 @@
 'use strict'
 
 const Post = require("../../model/Post.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.update_post = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -15,18 +16,11 @@ module.exports.update_post = async function (event, context, callback) {
             try {
                 const post = await Post.findById(post_id).populate("creator")
 
-                if (!((post.creator._id).equals(user_id))) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 403,
-                            body: JSON.stringify({
-                                message: "Forbidden to the resource",
-                                error: true
-                            })
-                        }
+                if (!((post.creator._id).equals(user_id)))
+                    throw new Api_Error(
+                        403,
+                        "Forbidden to te resource"
                     )
-                }
 
                 post.title = title
                 post.content = content
@@ -35,24 +29,21 @@ module.exports.update_post = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
+                    new Api_Response(
+                        200,
+                        {
                             message: "Updated post Successfully",
                             result: updated_post
-                        })
-                    }
+                        }
+                    )
                 )
             } catch (error) {
-                return (
+                return callback(
                     null,
-                    {
-                        statusCode: error.statusCode || 500,
-                        body: JSON.stringify({
-                            message: "Could not update the post",
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        "Could not update the post"
+                    )
                 )
             }
         })

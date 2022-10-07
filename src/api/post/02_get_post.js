@@ -1,7 +1,8 @@
 'use strict'
 
 const Post = require("../../model/Post.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.get_post = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -13,40 +14,28 @@ module.exports.get_post = async function (event, context, callback) {
             try {
                 const post = await Post.findById(post_id)
 
-                if (!post) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Post with id ${post_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
                     )
-                }
 
                 const populated_post = await post.populate("creator", "_id username email")
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
-                            result: populated_post
-                        })
-                    }
+                    new Api_Response(
+                        200,
+                        { result: populated_post }
+                    )
                 )
             } catch (error) {
-                callback(
+                return callback(
                     null,
-                    {
-                        statusCode: err.statusCode || 500,
-                        body: JSON.stringify({
-                            message: `Could not fetch post with id ${post_id}`,
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        `Could not fetch post with id ${post_id}`
+                    )
                 )
             }
         })

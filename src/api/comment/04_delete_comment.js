@@ -4,7 +4,8 @@ const mongoose = require("mongoose")
 const Post = require("../../model/Post.model")
 const User = require("../../model/User.model")
 const Comment = require("../../model/Comment.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.delete_comment = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -17,61 +18,33 @@ module.exports.delete_comment = async function (event, context, callback) {
             try {
                 const comment = await Comment.findById(comment_id).populate("comment_creator")
 
-                if (!comment) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Comment with id ${comment_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!comment)
+                    throw new Api_Error(
+                        404,
+                        `Comment with id ${comment_id} not found`
                     )
-                }
 
                 const post = await Post.findById(comment.parent_post).populate("comments")
 
-                if (!post) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Post with id ${post_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
                     )
-                }
 
                 const user = await User.findById(user_id)
 
-                if (!user) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: "Could not delete the comment. User not found",
-                                error: true
-                            })
-                        }
+                if (!user)
+                    throw new Api_Error(
+                        404,
+                        "Could not delete comment. User not found"
                     )
-                }
 
-                if (!(comment.comment_creator).equals(user_id)) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 403,
-                            body: JSON.stringify({
-                                message: "Forbidden to the resource",
-                                error: true
-                            })
-                        }
+                if (!(comment.comment_creator).equals(user_id))
+                    throw new Api_Error(
+                        403,
+                        "Forbidden to the resource."
                     )
-                }
 
                 const session = await mongoose.startSession()
                 session.startTransaction()
@@ -90,24 +63,21 @@ module.exports.delete_comment = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
+                    new Api_Response(
+                        200,
+                        {
                             message: `Successfully deleted the comment with id ${comment_id}`,
                             deleted: true
-                        })
-                    }
+                        }
+                    )
                 )
             } catch (error) {
                 return callback(
                     null,
-                    {
-                        statusCode: error.statusCode || 500,
-                        body: JSON.stringify({
-                            message: `Could not delete post with id ${comment_id}`,
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        `Could not delete post with id ${comment_id}`
+                    )
                 )
             }
         })

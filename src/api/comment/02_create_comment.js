@@ -3,7 +3,8 @@
 const User = require("../../model/User.model")
 const Post = require("../../model/Post.model")
 const Comment = require("../../model/Comment.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.create_comment = async function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -18,33 +19,19 @@ module.exports.create_comment = async function (event, context, callback) {
             try {
                 const post = await Post.findById(post_id)
 
-                if (!post) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Post with id ${post_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
                     )
-                }
 
                 const user = await User.findById(user_id)
 
-                if (!user) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: "Could not create comment. User not found",
-                                error: true
-                            })
-                        }
+                if (!user)
+                    throw new Api_Error(
+                        404,
+                        "Could not create comment. User not found"
                     )
-                }
 
                 const comment = await Comment.create({
                     parent_post: post_id,
@@ -60,25 +47,22 @@ module.exports.create_comment = async function (event, context, callback) {
 
                 return callback(
                     null,
-                    {
-                        statusCode: 201,
-                        body: JSON.stringify({
+                    new Api_Response(
+                        201,
+                        {
                             message: "Created comment successfully",
                             result: comment
-                        })
-                    }
+                        }
+                    )
                 )
 
             } catch (error) {
                 return callback(
                     null,
-                    {
-                        statusCode: error.statusCode || 500,
-                        body: JSON.stringify({
-                            message: "Could not create comment.",
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        "Could not create comment."
+                    )
                 )
             }
         })

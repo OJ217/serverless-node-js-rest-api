@@ -1,7 +1,8 @@
 'use strict'
 
 const Post = require("../../model/Post.model")
-const { connect_db } = require("../../utils/db_connection.util")
+const { connect_db } = require("../../utils/db_util/db_connection.util")
+const { Api_Response, Api_Error, Error_Response } = require("../../utils/responses/api_response.util")
 
 module.exports.delete_post = function (event, context, callback) {
     context.callbackWaitsForEmptyEventLoop = false
@@ -14,55 +15,37 @@ module.exports.delete_post = function (event, context, callback) {
             try {
                 const post = await Post.findById(post_id).populate("creator")
 
-                if (!post) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 404,
-                            body: JSON.stringify({
-                                message: `Post with id ${post_id} not found`,
-                                error: true
-                            })
-                        }
+                if (!post)
+                    throw new Api_Error(
+                        404,
+                        `Post with id ${post_id} not found`
                     )
-                }
 
-                if (!((post.creator._id).equals(user_id))) {
-                    return callback(
-                        null,
-                        {
-                            statusCode: 403,
-                            body: JSON.stringify({
-                                message: "Forbidden to the resource",
-                                error: true
-                            })
-                        }
+                if (!((post.creator._id).equals(user_id)))
+                    throw new Api_Error(
+                        403,
+                        "Forbidden to the resource"
                     )
-                }
 
                 await post.deleteOne()
 
                 return callback(
                     null,
-                    {
-                        statusCode: 200,
-                        body: JSON.stringify({
+                    new Api_Response(
+                        200,
+                        {
                             message: `Successfully deleted the post with id ${post_id}`,
                             deleted: true
-                        })
-                    }
+                        }
+                    )
                 )
             } catch (error) {
-                console.log(error)
                 return callback(
                     null,
-                    {
-                        statusCode: error.statusCode || 500,
-                        body: JSON.stringify({
-                            message: "Could not delete the post",
-                            error
-                        })
-                    }
+                    new Error_Response(
+                        error,
+                        "Could not delete the post"
+                    )
                 )
             }
         })
