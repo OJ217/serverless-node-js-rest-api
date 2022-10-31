@@ -19,7 +19,7 @@ module.exports.connect_db = async function () {
             db_connection = db.connections[0].readyState
         })
         .catch(err => {
-            console.err(err)
+            console.error(err)
             process.exit(1)
         })
 

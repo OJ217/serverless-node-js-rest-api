@@ -1,6 +1,5 @@
 'use strict'
 
-const mongoose = require("mongoose")
 const User = require("../../model/User.model")
 const Post = require("../../model/Post.model")
 const Comment = require("../../model/Comment.model")
